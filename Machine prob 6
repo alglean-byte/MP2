@@ -1,1 +1,161 @@
+import java.util.Scanner;
 
+class Student {
+    private String id;
+    private String name;
+
+    public Student(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+
+class Course {
+    private String code;
+    private String title;
+    private int capacity;
+    private Student[] enrolledStudents;
+    private int enrolledCount;
+
+    public Course(String code, String title, int capacity) {
+        this.code = code;
+        this.title = title;
+        this.capacity = capacity;
+        this.enrolledStudents = new Student[capacity];
+        this.enrolledCount = 0;
+    }
+
+    public boolean enroll(Student student) {
+
+        if (student == null) {
+            return false;
+        }
+
+        // Check for duplicate
+        for (int i = 0; i < enrolledCount; i++) {
+            if (enrolledStudents[i].getId().equals(student.getId())) {
+                return false;
+            }
+        }
+
+        // Check if full
+        if (enrolledCount >= capacity) {
+            return false;
+        }
+
+        enrolledStudents[enrolledCount] = student;
+        enrolledCount++;
+
+        return true;
+    }
+
+    public Student findStudent(String id) {
+
+        for (int i = 0; i < enrolledCount; i++) {
+            if (enrolledStudents[i].getId().equals(id)) {
+                return enrolledStudents[i];
+            }
+        }
+
+        return null;
+    }
+
+    public void displayRoster() {
+
+        System.out.println("\nCourse: " + code + " - " + title);
+        System.out.println("Roster:");
+
+        for (int i = 0; i < enrolledCount; i++) {
+            System.out.println(
+                enrolledStudents[i].getId() + " - " +
+                enrolledStudents[i].getName()
+            );
+        }
+
+        System.out.println("Occupied slots: " + enrolledCount);
+        System.out.println("Remaining slots: " + (capacity - enrolledCount));
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("Course Code: ");
+        String code = input.nextLine();
+
+        System.out.print("Course Title: ");
+        String title = input.nextLine();
+
+        System.out.print("Course Capacity: ");
+        int capacity = input.nextInt();
+        input.nextLine();
+
+        Course course = new Course(code, title, capacity);
+
+        System.out.print("Number of students: ");
+        int numberOfStudents = input.nextInt();
+        input.nextLine();
+
+        Student[] students = new Student[numberOfStudents];
+
+        // Create students
+        for (int i = 0; i < numberOfStudents; i++) {
+
+            System.out.println("\nStudent " + (i + 1));
+
+            System.out.print("Student ID: ");
+            String id = input.nextLine();
+
+            System.out.print("Full Name: ");
+            String name = input.nextLine();
+
+            students[i] = new Student(id, name);
+        }
+
+        System.out.print("\nNumber of enrollment attempts: ");
+        int attempts = input.nextInt();
+        input.nextLine();
+
+        // Enrollment attempts
+        for (int i = 0; i < attempts; i++) {
+
+            System.out.print("\nEnter Student ID to enroll: ");
+            String id = input.nextLine();
+
+            Student foundStudent = null;
+
+            // Search master Student array
+            for (int j = 0; j < students.length; j++) {
+                if (students[j].getId().equals(id)) {
+                    foundStudent = students[j];
+                    break;
+                }
+            }
+
+            if (foundStudent == null) {
+                System.out.println("Student not found.");
+            }
+            else if (course.enroll(foundStudent)) {
+                System.out.println("Student enrolled successfully.");
+            }
+            else {
+                System.out.println("Enrollment rejected.");
+            }
+        }
+
+        course.displayRoster();
+
+        input.close();
+    }
+}
